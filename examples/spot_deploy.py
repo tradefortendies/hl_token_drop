@@ -10,10 +10,12 @@ import example_utils
 
 from hyperliquid.utils import constants
 
+# Set to True to finalize genesis
+FINALIZE_GENESIS = False
 # Set to True to register the spot pair (TOKEN/USDC)
 REGISTER_SPOT = False
 # Set to True to register hyperliquidity for the spot pair
-REGISTER_HYPERLIQUIDITY = False
+REGISTER_HYPERLIQUIDITY = True
 
 def main():
     address, info, exchange = example_utils.setup(constants.TESTNET_API_URL, skip_ws=True)
@@ -26,46 +28,47 @@ def main():
     token = int(config['token'])
     hyperliquidity_address = config['hyperliquidity_address']
     airdrop_wallet_address = config['airdrop_wallet_address']
+    
+    if FINALIZE_GENESIS:
+        # Step 2: User Genesis
+        #
+        # User genesis can be called multiple times to associate balances to specific users and/or
+        # tokens for genesis.
+        #
+        # Associate 9499100000000000000 wei with user 0x0000000000000000000000000000000000000001
+        # Associate 500000000000000000 wei with hyperliquidity
+        # Associate 1M tokens each as an example with airdrop wallets that are part of genesis
+        user_genesis_result = exchange.spot_deploy_user_genesis(
+            token,
+            [
+                (airdrop_wallet_address, "9499100000000000000"),
+                (hyperliquidity_address, "500000000000000000"),
+                ("0xEf920E4D5fF99B5e5BaF27A919dee46D4719Eb5B", "100000000000000"),
+                ("0x0ac6d5e95f0d9342eddd94bba7483e64496dfbd6", "100000000000000"),
+                ("0x026433a0683fe1fcd3c75131f20983526f30f363", "100000000000000"),
+                ("0x4c1c77a0ccB5E9dcEFf0b51d2eF6B8Fd87Cf4eCf", "100000000000000"),
+                ("0x25dd028fb9ebc9e6244fb1b2329d7b1a5c53b36c", "100000000000000"),
+                ("0x9db844d9aed745a8af4917b5323d52d83362d072", "100000000000000"),
+                ("0x949374d5677bb336d948bd4b0ec0e37a3fc20e03", "100000000000000"),
+                ("0xc8dad4333de7aba9f2aa8f5cbb0e727cac3bfdff", "100000000000000"),
+                ("0xf7b4fb02ae66143d001c1e4e43cb39f450f0b674", "100000000000000"),
+            ],
+            [],
+        )
+        print(user_genesis_result)
+        # No-op
+        user_genesis_result = exchange.spot_deploy_user_genesis(token, [], [])
+        print(user_genesis_result)
 
-    # Step 2: User Genesis
-    #
-    # User genesis can be called multiple times to associate balances to specific users and/or
-    # tokens for genesis.
-    #
-    # Associate 9499100000000000000 wei with user 0x0000000000000000000000000000000000000001
-    # Associate 500000000000000000 wei with hyperliquidity
-    # Associate 1M tokens each as an example with airdrop wallets that are part of genesis
-    user_genesis_result = exchange.spot_deploy_user_genesis(
-        token,
-        [
-            (airdrop_wallet_address, "9499100000000000000"),
-            (hyperliquidity_address, "500000000000000000"),
-            ("0xEf920E4D5fF99B5e5BaF27A919dee46D4719Eb5B", "100000000000000"),
-            ("0x0ac6d5e95f0d9342eddd94bba7483e64496dfbd6", "100000000000000"),
-            ("0x026433a0683fe1fcd3c75131f20983526f30f363", "100000000000000"),
-            ("0x4c1c77a0ccB5E9dcEFf0b51d2eF6B8Fd87Cf4eCf", "100000000000000"),
-            ("0x25dd028fb9ebc9e6244fb1b2329d7b1a5c53b36c", "100000000000000"),
-            ("0x9db844d9aed745a8af4917b5323d52d83362d072", "100000000000000"),
-            ("0x949374d5677bb336d948bd4b0ec0e37a3fc20e03", "100000000000000"),
-            ("0xc8dad4333de7aba9f2aa8f5cbb0e727cac3bfdff", "100000000000000"),
-            ("0xf7b4fb02ae66143d001c1e4e43cb39f450f0b674", "100000000000000"),
-        ],
-        [],
-    )
-    print(user_genesis_result)
-    # No-op
-    user_genesis_result = exchange.spot_deploy_user_genesis(token, [], [])
-    print(user_genesis_result)
-
-    # Step 3: Genesis
-    #
-    # Finalize genesis. The max supply of 10000000000000000000 wei needs to match the total
-    # allocation above from user genesis.
-    #
-    # "noHyperliquidity" can also be set to disable hyperliquidity. In that case, no balance
-    # should be associated with hyperliquidity from step 2 (user genesis).
-    genesis_result = exchange.spot_deploy_genesis(token, "10000000000000000000", False)
-    print(genesis_result)
+        # Step 3: Genesis
+        #
+        # Finalize genesis. The max supply of 10000000000000000000 wei needs to match the total
+        # allocation above from user genesis.
+        #
+        # "noHyperliquidity" can also be set to disable hyperliquidity. In that case, no balance
+        # should be associated with hyperliquidity from step 2 (user genesis).
+        genesis_result = exchange.spot_deploy_genesis(token, "10000000000000000000", False)
+        print(genesis_result)
 
     if REGISTER_SPOT:
         # Step 4: Register Spot
