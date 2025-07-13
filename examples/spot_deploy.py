@@ -89,7 +89,13 @@ def main():
             #
             # This step is required even if "noHyperliquidity" was set to True.
             # If "noHyperliquidity" was set to True during step 3 (genesis), then "n_orders" is required to be 0.
-            register_hyperliquidity_result = exchange.spot_deploy_register_hyperliquidity(spot, 2.0, 4.0, 100, None)
+            register_hyperliquidity_result = exchange.spot_deploy_register_hyperliquidity(
+                spot,           # Your spot index
+                0.0000008,      # startPx - gives $80K starting market cap  
+                1250000.0,      # orderSz - 1.25M tokens per order
+                4000,           # nOrders - maximum for tightest spread
+                0               # nSeededLevels - 0 to avoid USDC requirement
+            )            
             print(register_hyperliquidity_result)
 
 
