@@ -1,0 +1,8 @@
+{
+  "account_address": "0x...",
+  "secret_key": "0x...",
+  "token": "1...",
+  "hyperliquidity_address": "0x...",
+  "airdrop_wallet_address": "0x...",
+  "comments": "Set the public key as the account_address and your private key as the secret_key. For API wallets, use the main wallet public key as account_address, not the API wallet address. Token is the token index for spot operations."
+} 
